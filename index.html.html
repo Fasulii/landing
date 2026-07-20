@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PokeSleeve TCG — Cartas Pokémon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #131a30;
+  --surface: #1c2540;
+  --surface-2: #29335a;
+  --line: #414f80;
+  --text: #f4f6fb;
+  --text-dim: #aab2cf;
+  --gold: #f0bd5c;
+  --gold-dim: #c99a3f;
+  --holo-1: #8effe0;
+  --holo-2: #ff8fe3;
+  --holo-3: #ffe08a;
+  --holo-4: #8fd4ff;
+  --radius: 14px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before{
+    content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 1000px 600px at 12% -8%, rgba(143,212,255,0.22), transparent 60%),
+    radial-gradient(ellipse 800px 550px at 92% 8%, rgba(255,143,227,0.18), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 50% 100%, rgba(142,255,224,0.10), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  }
+
+  a{ color: inherit; }
+  h1,h2,h3{ font-family: 'Chakra Petch', sans-serif; margin: 0; }
+  .mono{ font-family: 'Space Mono', monospace; }
+
+  .wrap{ max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(11,15,26,0.75);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap{ display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; }
+  .brand{ display: flex; align-items: center; gap: 10px; font-family: 'Chakra Petch'; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; }
+  .brand-mark{
+    width: 30px; height: 30px; border-radius: 7px;
+    background: linear-gradient(135deg, var(--holo-1), var(--holo-2) 45%, var(--holo-3) 75%, var(--holo-4));
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset;
+    flex-shrink: 0;
+  }
+  .nav-cta{
+    font-size: 0.85rem; font-weight: 600; font-family: 'Inter';
+    background: var(--gold); color: #1a1206; padding: 9px 16px; border-radius: 999px;
+    text-decoration: none; white-space: nowrap;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .nav-cta:hover{ transform: translateY(-1px); box-shadow: 0 4px 16px rgba(227,179,78,0.35); }
+  .nav-cta:focus-visible{ outline: 2px solid var(--holo-4); outline-offset: 2px; }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding: 84px 0 60px; position: relative; }
+  .hero .wrap{ display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  .eyebrow{
+    font-family: 'Space Mono'; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--holo-1); display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
+  }
+  .eyebrow::before{ content: "●"; color: var(--gold); font-size: 0.6rem; }
+  .hero h1{
+    font-size: clamp(2.1rem, 4.2vw, 3.4rem); line-height: 1.08; font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 .accent{
+    background: linear-gradient(100deg, var(--holo-1), var(--holo-4) 40%, var(--holo-2) 75%, var(--holo-3));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lede{
+    margin-top: 20px; font-size: 1.05rem; line-height: 1.6; color: var(--text-dim); max-width: 46ch;
+  }
+  .hero-actions{ margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; }
+
+  .btn{
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 14px 24px; border-radius: 10px; font-weight: 600; font-size: 0.95rem;
+    text-decoration: none; border: 1px solid transparent; cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .btn:focus-visible{ outline: 2px solid var(--holo-4); outline-offset: 3px; }
+  .btn-primary{ background: var(--gold); color: #1a1206; }
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 8px 24px rgba(227,179,78,0.3); }
+  .btn-ghost{ background: transparent; border-color: var(--line); color: var(--text); }
+  .btn-ghost:hover{ border-color: var(--holo-4); transform: translateY(-2px); }
+
+  .stat-row{ display: flex; gap: 28px; margin-top: 40px; flex-wrap: wrap; }
+  .stat{ }
+  .stat .val{ font-family: 'Chakra Petch'; font-weight: 700; font-size: 1.5rem; color: var(--text); }
+  .stat .lab{ font-family: 'Space Mono'; font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ---------- Card stack (signature) ---------- */
+  .stack{ position: relative; height: 380px; }
+  .pcard{
+    position: absolute; width: 230px; height: 320px; border-radius: 16px;
+    left: 50%; top: 10px;
+    background: linear-gradient(160deg, #1a2338, #0f1526);
+    border: 1px solid var(--line);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+  }
+  .pcard .inner{
+    position: absolute; inset: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; justify-content: space-between; padding: 14px;
+    background: rgba(255,255,255,0.015);
+  }
+  .pcard .cnum{ font-family: 'Space Mono'; font-size: 0.65rem; color: var(--text-dim); }
+  .pcard .cname{ font-family: 'Chakra Petch'; font-weight: 600; font-size: 0.95rem; }
+  .pcard .art{
+    flex: 1; margin: 10px 0; border-radius: 6px;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.08), transparent 60%), var(--surface-2);
+    border: 1px solid var(--line);
+  }
+  .pcard.c1{ transform: translate(-50%, 0) rotate(-9deg); z-index: 1; opacity: 0.75; }
+  .pcard.c2{ transform: translate(-50%, 0) rotate(6deg); z-index: 2; opacity: 0.9; }
+  .pcard.c3{
+    transform: translate(-50%, -6px) rotate(-2deg); z-index: 3;
+    overflow: hidden;
+  }
+  .pcard.c3::after{
+    content: "";
+    position: absolute; inset: 0; border-radius: 16px;
+    background: linear-gradient(115deg, transparent 30%, rgba(127,255,212,0.35) 45%, rgba(255,126,219,0.35) 52%, rgba(255,216,107,0.3) 58%, transparent 72%);
+    background-size: 250% 250%;
+    animation: holo-sweep 5.5s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes holo-sweep{
+    0%{ background-position: 0% 0%; }
+    50%{ background-position: 100% 100%; }
+    100%{ background-position: 0% 0%; }
+  }
+  .badge-rare{
+    align-self: flex-start; font-family: 'Space Mono'; font-size: 0.6rem; letter-spacing: 0.06em;
+    color: var(--gold); border: 1px solid var(--gold-dim); border-radius: 999px; padding: 3px 8px;
+  }
+
+  /* ---------- SECTION HEAD ---------- */
+  section{ padding: 70px 0; position: relative; }
+  .sec-head{ margin-bottom: 40px; max-width: 60ch; }
+  .sec-head .eyebrow{ margin-bottom: 12px; }
+  .sec-head h2{ font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; }
+  .sec-head p{ color: var(--text-dim); margin-top: 12px; line-height: 1.6; }
+
+  /* ---------- CATALOG (binder grid) ---------- */
+  .binder{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 22px;
+  }
+  .binder-grid{
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 18px;
+  }
+  .slot{
+    position: relative; border-radius: 14px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    overflow: hidden; cursor: default;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .slot:hover{ transform: translateY(-6px); border-color: var(--holo-4); box-shadow: 0 14px 30px rgba(0,0,0,0.45); }
+  .slot-art{
+    position: relative; aspect-ratio: 245/342;
+    background-color: #10182a;
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .slot-art::after{
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(115deg, transparent 20%, rgba(127,255,212,0.22) 40%, rgba(255,126,219,0.22) 50%, rgba(255,216,107,0.18) 60%, transparent 80%);
+    background-size: 250% 250%; background-position: 0% 0%;
+    opacity: 0; transition: opacity 0.3s ease;
+    mix-blend-mode: screen; pointer-events: none;
+  }
+  .slot:hover .slot-art::after{ opacity: 1; animation: holo-sweep 2.4s ease-in-out infinite; }
+  .slot-body{ padding: 14px 16px 18px; }
+  .slot-name{ font-family: 'Chakra Petch'; font-weight: 600; font-size: 0.98rem; }
+  .slot-num{ font-family: 'Space Mono'; font-size: 0.72rem; color: var(--text-dim); margin-top: 3px; }
+  .slot-rarity{
+    display: inline-block; margin-top: 10px;
+    font-family: 'Space Mono'; font-size: 0.62rem; letter-spacing: 0.05em;
+    color: var(--gold); border: 1px solid var(--gold-dim); border-radius: 999px; padding: 3px 10px;
+  }
+  .slot-price{
+    font-family: 'Chakra Petch'; font-weight: 700; font-size: 1.35rem;
+    color: #4ade80; margin-top: 12px;
+  }
+  .slot-cta{
+    display: block; text-align: center; margin-top: 14px;
+    font-family: 'Inter'; font-size: 0.82rem; font-weight: 600;
+    color: var(--text); background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px; text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .slot-cta:hover{ border-color: var(--holo-4); background: var(--surface-2); }
+
+  .catalog-note{
+    text-align: center; margin-top: 24px; color: var(--text-dim); font-size: 0.85rem;
+  }
+
+  /* ---------- WHY / FEATURES ---------- */
+  .features{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .feat{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px;
+  }
+  .feat .stat-tag{ font-family: 'Space Mono'; font-size: 0.68rem; color: var(--holo-1); letter-spacing: 0.06em; }
+  .feat h3{ font-size: 1.05rem; margin-top: 10px; font-weight: 600; }
+  .feat p{ color: var(--text-dim); font-size: 0.9rem; margin-top: 8px; line-height: 1.55; }
+
+  /* ---------- CTA BAND ---------- */
+  .cta-band{
+    border-radius: 22px;
+    background: linear-gradient(135deg, #141b2b, #0f1526);
+    border: 1px solid var(--line);
+    padding: 52px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-band::before{
+    content: "";
+    position: absolute; inset: -40% -10% auto -10%; height: 220px;
+    background: linear-gradient(90deg, var(--holo-1), var(--holo-2), var(--holo-3), var(--holo-4));
+    filter: blur(70px); opacity: 0.18;
+  }
+  .cta-band h2{ font-size: clamp(1.5rem, 3vw, 2.1rem); position: relative; }
+  .cta-band p{ color: var(--text-dim); margin-top: 12px; position: relative; }
+  .cta-band .hero-actions{ justify-content: center; margin-top: 28px; position: relative; }
+
+  /* ---------- FOOTER ---------- */
+  footer{ border-top: 1px solid var(--line); padding: 32px 0; }
+  footer .wrap{ display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  footer .fbrand{ font-family: 'Chakra Petch'; font-weight: 600; font-size: 0.9rem; color: var(--text-dim); }
+  footer .flinks{ display: flex; gap: 18px; font-size: 0.85rem; }
+  footer .flinks a{ color: var(--text-dim); text-decoration: none; }
+  footer .flinks a:hover{ color: var(--text); }
+
+  @media (max-width: 860px){
+    .hero .wrap{ grid-template-columns: 1fr; }
+    .stack{ height: 300px; margin-top: 10px; }
+    .binder-grid{ grid-template-columns: repeat(2, 1fr); }
+    .features{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px){
+    .binder-grid{ grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cta-band{ padding: 36px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark"></span>PokeSleeve<span style="color:var(--text-dim); font-weight:500;">.tcg</span></div>
+    <a class="nav-cta" href="https://www.instagram.com/pokesleeve.tcg/" target="_blank" rel="noopener">Ver Instagram</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Colección privada · Venta directa</div>
+      <h1>Cartas Pokémon que valen<br>la <span class="accent">pena coleccionar</span></h1>
+      <p class="lede">Compro, vendo e intercambio cartas sueltas, sets y piezas raras. Todo el catálogo se actualiza primero en Instagram — mirá lo último y separá la tuya por DM.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://www.instagram.com/pokesleeve.tcg/" target="_blank" rel="noopener">Ver catálogo en Instagram</a>
+        <a class="btn btn-ghost" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Escribir por DM</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="val">+150</div><div class="lab">Cartas en stock</div></div>
+        <div class="stat"><div class="val">4</div><div class="lab">Rarezas disponibles</div></div>
+        <div class="stat"><div class="val">24hs</div><div class="lab">Respuesta por DM</div></div>
+      </div>
+    </div>
+
+    <div class="stack" aria-hidden="true">
+      <div class="pcard c1"><div class="inner">
+        <div class="slot-top"><span class="cnum">044/198</span><span class="badge-rare">RARA</span></div>
+        <div class="art"></div>
+        <div class="cname">Vaporeon</div>
+      </div></div>
+      <div class="pcard c2"><div class="inner">
+        <div class="slot-top"><span class="cnum">002/198</span><span class="badge-rare">COMÚN</span></div>
+        <div class="art"></div>
+        <div class="cname">Bulbasaur</div>
+      </div></div>
+      <div class="pcard c3"><div class="inner">
+        <div class="slot-top"><span class="cnum">025/198</span><span class="badge-rare">HOLO</span></div>
+        <div class="art"></div>
+        <div class="cname">Pikachu VMAX</div>
+      </div></div>
+    </div>
+  </div>
+</header>
+
+<section id="catalogo">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Álbum de muestra</div>
+      <h2>Una espiada al aglutinador</h2>
+      <p>Selección de ejemplo — el stock real y los precios actualizados están siempre en el feed de Instagram. Tocá "Ver Instagram" para la lista completa.</p>
+    </div>
+
+    <div class="binder">
+      <div class="binder-grid">
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('116.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Mega Darkrai ex</div>
+            <div class="slot-num">#116/084</div>
+            <span class="slot-rarity">SIR</span>
+            <div class="slot-price">$ 297.75</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('120.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Mega Darkrai ex</div>
+            <div class="slot-num">#120/084</div>
+            <span class="slot-rarity">MHR</span>
+            <div class="slot-price">$ 202.54</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('117.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Morpeko ex</div>
+            <div class="slot-num">#117/084</div>
+            <span class="slot-rarity">SIR</span>
+            <div class="slot-price">$ 91.84</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('114.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Mega Zeraora ex</div>
+            <div class="slot-num">#114/084</div>
+            <span class="slot-rarity">SIR</span>
+            <div class="slot-price">$ 65.53</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('115.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Mega Chandelure ex</div>
+            <div class="slot-num">#115/084</div>
+            <span class="slot-rarity">SIR</span>
+            <div class="slot-price">$ 55.24</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('119.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Gwynn</div>
+            <div class="slot-num">#119/084</div>
+            <span class="slot-rarity">SIR</span>
+            <div class="slot-price">$ 39.92</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('111.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Misty's Vitality</div>
+            <div class="slot-num">#111/084</div>
+            <span class="slot-rarity">UR</span>
+            <div class="slot-price">$ 32.55</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('118.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Gladion's Final Battle</div>
+            <div class="slot-num">#118/084</div>
+            <span class="slot-rarity">SIR</span>
+            <div class="slot-price">$ 31.35</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('90.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Slowbro</div>
+            <div class="slot-num">#90/084</div>
+            <span class="slot-rarity">IR</span>
+            <div class="slot-price">$ 20.13</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-art" style="background-image:url('87.webp');"></div>
+          <div class="slot-body">
+            <div class="slot-name">Goldeen</div>
+            <div class="slot-num">#87/084</div>
+            <span class="slot-rarity">RARA</span>
+            <div class="slot-price">$ 14,34</div>
+            <a class="slot-cta" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Consultar por DM</a>
+          </div>
+        </div>
+      </div>
+      <p class="catalog-note">Precios y disponibilidad se confirman por DM · placeholders de ejemplo</p>
+    </div>
+  </div>
+</section>
+
+<section id="por-que">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Cómo funciona</div>
+      <h2>Comprar es simple</h2>
+    </div>
+    <div class="features">
+      <div class="feat">
+        <div class="stat-tag">PASO — MIRÁ</div>
+        <h3>Explorá el feed</h3>
+        <p>Cada publicación muestra la carta, su estado de conservación y si sigue disponible.</p>
+      </div>
+      <div class="feat">
+        <div class="stat-tag">PASO — CONSULTÁ</div>
+        <h3>Escribí por DM</h3>
+        <p>Contanos qué carta te interesa y te confirmamos precio, estado y forma de envío.</p>
+      </div>
+      <div class="feat">
+        <div class="stat-tag">PASO — RESERVÁ</div>
+        <h3>Separá la tuya</h3>
+        <p>Coordinamos el pago y el envío o la entrega en mano, como prefieras.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contacto">
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>¿Viste una carta que te gustó?</h2>
+      <p>Escribinos por DM en Instagram y te contamos si sigue disponible.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">Escribir por DM</a>
+        <a class="btn btn-ghost" href="https://www.instagram.com/pokesleeve.tcg/" target="_blank" rel="noopener">Ir al perfil</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fbrand">PokeSleeve.tcg</div>
+    <div class="flinks">
+      <a href="https://www.instagram.com/pokesleeve.tcg/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://ig.me/m/pokesleeve.tcg" target="_blank" rel="noopener">DM directo</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
